@@ -1,0 +1,7 @@
+{
+  "platform": "windows",
+  "files": [
+    {"file": "Code/Application Launcher/Splash Screen.vi", "type": "modified", "report": "Code-Application_Launcher-Splash_Screen.vi/index.html"},
+    {"file": "Code/main.vi", "type": "added", "report": "Code-main.vi/index.html"}
+  ]
+}
