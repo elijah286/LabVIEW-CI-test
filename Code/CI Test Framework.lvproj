@@ -70,6 +70,7 @@
 			<Item Name="Programmatic Controller.lvclass" Type="LVClass" URL="../Programmatic Controller/Programmatic Controller.lvclass"/>
 		</Item>
 		<Item Name="Air Cooler App.ini" Type="Document" URL="../Air Cooler App.ini"/>
+		<Item Name="main.vi" Type="VI" URL="../main.vi"/>
 		<Item Name="Dependencies" Type="Dependencies"/>
 		<Item Name="Build Specifications" Type="Build">
 			<Item Name="Cooler Application" Type="EXE">
