@@ -6,9 +6,9 @@
   "base_image": "nationalinstruments/labview:latest-linux",
   "base_digest": "nationalinstruments/labview@sha256:c6484cf4d66a14355bd3195849c090573f413ed355c429c8cc0752fee589b28c",
   "image_ref": "nationalinstruments/labview:latest-linux",
-  "build_date": "2026-06-18T22:41:28Z",
-  "git_sha": "39fb022e04c602318b92fd43c38113f15a7dbecd",
-  "run_url": "https://github.com/elijah286/LabVIEW-CI-test/actions/runs/27793737646",
+  "build_date": "2026-06-18T22:51:23Z",
+  "git_sha": "7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2",
+  "run_url": "https://github.com/elijah286/LabVIEW-CI-test/actions/runs/27794143273",
   "vipc": [],
   "nipkg_raw": "",
   "nipkg_packages": []
