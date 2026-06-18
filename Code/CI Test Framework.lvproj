@@ -69,6 +69,22 @@
 			<Item Name="Live User Controller.lvclass" Type="LVClass" URL="../Live User Controller/Live User Controller.lvclass"/>
 			<Item Name="Programmatic Controller.lvclass" Type="LVClass" URL="../Programmatic Controller/Programmatic Controller.lvclass"/>
 		</Item>
+		<Item Name="User-Defined Test" Type="Folder">
+			<Item Name="Example.css" Type="Document" URL="../User-Defined Test/Example.css"/>
+			<Item Name="User-Defined Advanced.lvtest" Type="TestItem" URL="../User-Defined Test/User-Defined Advanced.lvtest">
+				<Property Name="utf.test.bind" Type="Str">VI Under Test.vi</Property>
+				<Property Name="utf.vector.test.bind" Type="Str">406529DA-B1F0-E595-405B-B40709093551</Property>
+			</Item>
+			<Item Name="User-Defined Basic.lvtest" Type="TestItem" URL="../User-Defined Test/User-Defined Basic.lvtest">
+				<Property Name="utf.test.bind" Type="Str">VI Under Test.vi</Property>
+				<Property Name="utf.vector.test.bind" Type="Str">E432E38A-697B-844C-E5D0-1029B58BE092</Property>
+			</Item>
+			<Item Name="User-Defined Test Advanced.vi" Type="VI" URL="../User-Defined Test/User-Defined Test Advanced.vi"/>
+			<Item Name="User-Defined Test Basic.vi" Type="VI" URL="../User-Defined Test/User-Defined Test Basic.vi"/>
+			<Item Name="User-Defined Test.aliases" Type="Document" URL="../User-Defined Test/User-Defined Test.aliases"/>
+			<Item Name="User-Defined Test.lvproj" Type="Document" URL="../User-Defined Test/User-Defined Test.lvproj"/>
+			<Item Name="VI Under Test.vi" Type="VI" URL="../User-Defined Test/VI Under Test.vi"/>
+		</Item>
 		<Item Name="Air Cooler App.ini" Type="Document" URL="../Air Cooler App.ini"/>
 		<Item Name="main.vi" Type="VI" URL="../main.vi"/>
 		<Item Name="Dependencies" Type="Dependencies"/>
