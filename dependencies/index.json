@@ -1,0 +1,204 @@
+{
+  "schema": 1,
+  "repo": "elijah286/LabVIEW-CI-test",
+  "sha": "1bd3d8bb966517cb26cd970f40bae441122b2caf",
+  "revisions": [
+    {
+      "sha": "1bd3d8bb966517cb26cd970f40bae441122b2caf",
+      "short": "1bd3d8b",
+      "message": "Add LabVIEW CI pipeline",
+      "author": "Elijah Kerry",
+      "date": "2026-06-22T21:54:33Z"
+    },
+    {
+      "sha": "7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2",
+      "short": "7c1b9a0",
+      "message": "added unit tests",
+      "author": "Elijah Kerry",
+      "date": "2026-06-18T22:52:28Z"
+    },
+    {
+      "sha": "39fb022e04c602318b92fd43c38113f15a7dbecd",
+      "short": "39fb022",
+      "message": "Merge branch 'main' of https://github.com/elijah286/LabVIEW-CI-test",
+      "author": "Elijah Kerry",
+      "date": "2026-06-18T22:42:10Z"
+    },
+    {
+      "sha": "20b168716243bfc7959db6027a2c92607d276b65",
+      "short": "20b1687",
+      "message": "new launcher",
+      "author": "Elijah Kerry",
+      "date": "2026-06-18T22:42:01Z"
+    },
+    {
+      "sha": "177d20d278568a89b07343b594342aca23463e03",
+      "short": "177d20d",
+      "message": "Add LabVIEW CI pipeline",
+      "author": "Elijah Kerry",
+      "date": "2026-06-18T20:46:15Z"
+    },
+    {
+      "sha": "678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed",
+      "short": "678e3f7",
+      "message": "New project",
+      "author": "Elijah Kerry",
+      "date": "2026-06-18T20:45:31Z"
+    },
+    {
+      "sha": "86979d5a844245491d6c29e795acb8d182e102b8",
+      "short": "86979d5",
+      "message": "Add LabVIEW CI pipeline",
+      "author": "Elijah Kerry",
+      "date": "2026-06-18T20:44:51Z"
+    }
+  ],
+  "config": {
+    "use": "",
+    "actions": {},
+    "vipc": []
+  },
+  "vipc": [
+    {
+      "path": "github/labview/vipm/ci-tooling.vipc",
+      "configured": false,
+      "packages": [],
+      "error": "[Errno 2] No such file or directory: 'github/labview/vipm/ci-tooling.vipc'"
+    }
+  ],
+  "nipm": [
+    {
+      "name": "LabVIEW",
+      "source": "NI Package Manager",
+      "labview": true,
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "details": "LabVIEW runtime and development packages from the NI feeds."
+    },
+    {
+      "name": "VI Analyzer support",
+      "source": "NI Package Manager",
+      "packages": {
+        "windows": [
+          "ni-viawin-labview-support"
+        ],
+        "linux": [
+          "ni-vialin-labview-support"
+        ]
+      },
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "details": "NI VI Analyzer support package used by the analyzer runners."
+    },
+    {
+      "name": "NI Unit Test Framework",
+      "source": "NI Package Manager",
+      "packages": {
+        "windows": [
+          "ni-utf-labview-support"
+        ]
+      },
+      "platforms": [
+        "windows"
+      ],
+      "details": "NI UTF support package used by the Windows unit-test runner."
+    },
+    {
+      "name": "VI Package Manager",
+      "source": "NI Package Manager",
+      "packages": {
+        "windows": [
+          "ni-vipm"
+        ],
+        "linux": [
+          "ni-vipm"
+        ]
+      },
+      "platforms": [
+        "windows",
+        "linux"
+      ],
+      "details": "NI-published VIPM package that enables VIPC application during worker builds."
+    }
+  ],
+  "system": [
+    {
+      "name": "VI Browser 2.0 toimages runner",
+      "source": "Repository Go code",
+      "path": ".github/labview/toimages/main.go",
+      "details": "Batch runner compiled from repo Go source; Linux uses the toimages GHCR image and Windows builds runner.exe in the workflow.",
+      "platforms": {
+        "windows": {
+          "present": false,
+          "label": ""
+        },
+        "linux": {
+          "present": true,
+          "label": "toimages image"
+        }
+      }
+    },
+    {
+      "name": "lvctl render engine",
+      "source": "Repository Go code + embedded VIs",
+      "path": ".github/labview/toimages/_ni/labview/lvctl",
+      "details": "Renderer used by VI Browser 2.0 to drive LabVIEW and emit position-aware frame JSON.",
+      "platforms": {
+        "windows": {
+          "present": false,
+          "label": ""
+        },
+        "linux": {
+          "present": true,
+          "label": "toimages image"
+        }
+      }
+    }
+  ],
+  "columns": [
+    {
+      "key": "windows",
+      "label": "Windows",
+      "platform": "windows",
+      "defaultTag": "latest",
+      "tag": "latest",
+      "ready": false,
+      "packages": [],
+      "nipkg_ready": false,
+      "nipkg_packages": [],
+      "labview_version": "",
+      "version": "latest"
+    },
+    {
+      "key": "linux",
+      "label": "Linux",
+      "platform": "linux",
+      "tag": "base",
+      "ready": true,
+      "packages": [],
+      "version": "pending",
+      "unsupported": true,
+      "nipkg_ready": true,
+      "nipkg_packages": [],
+      "nipkg_version": "linux-c6484cf4d66a",
+      "labview_version": "2026"
+    },
+    {
+      "key": "linuxBeta",
+      "label": "Linux Beta",
+      "platform": "linux-beta",
+      "tag": "latest",
+      "defaultTag": "latest",
+      "ready": false,
+      "packages": [],
+      "nipkg_ready": false,
+      "nipkg_packages": [],
+      "labview_version": "",
+      "version": "latest"
+    }
+  ]
+}
