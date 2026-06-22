@@ -60,8 +60,13 @@
     .badge.rec{color:#fff;background:var(--accent);border-color:transparent}
     .badge.adv{color:#9a6700;border-color:#9a6700}
     .badge.planned{color:#bf8700;border-color:#bf8700}
+    .badge.exp{color:#cf222e;border-color:#cf222e}
     .badge.os{color:var(--fg-muted)}
     .note{font-size:.78em;color:var(--fg-muted);margin-top:6px}
+    .exp-details{margin-top:8px;font-size:.84em;color:var(--fg-muted)}
+    .exp-details summary{cursor:pointer;color:var(--link);user-select:none}
+    .exp-details ul{margin:7px 0 0;padding-left:18px}
+    .exp-details li{margin:0 0 5px}
     .tabs{display:flex;gap:4px;margin-bottom:0}
     .tab{padding:7px 14px;border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;
          background:var(--chip);cursor:pointer;font-size:.85em;color:var(--fg-muted)}
@@ -126,6 +131,14 @@
     .locked-area{opacity:.5;pointer-events:none;filter:saturate(.55)}
     .dashlink{display:inline-block;margin:10px 0 4px;padding:9px 16px;background:var(--accent);color:var(--accent-fg);border-radius:7px;font-weight:600;font-size:.9em;text-decoration:none}
     .dashlink:hover{filter:brightness(1.06)}
+    /* ---- target-repo picker (datalist) ---- */
+    .repopick{margin-top:7px}
+    .repopick a{cursor:pointer}
+    .repopick-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:8px}
+    .repopick-row input{flex:1 1 220px;min-width:170px;padding:7px 9px;background:var(--surface2);color:var(--fg);
+         border:1px solid var(--border);border-radius:6px;font-family:ui-monospace,Menlo,monospace;font-size:.8em}
+    .repopick-row .mini{font-size:.8em}
+    button.ghost.mini{padding:7px 11px;font-size:.8em}
   </style>
 </head>
 <body>
@@ -135,7 +148,6 @@
         <h1>Apply to a new repository</h1>
         <p class="sub">Add these LabVIEW CI capabilities to another repository. Pick what you want — get an install command and a ready-to-commit bundle.</p>
       </div>
-      <a class="back" id="backLink" href="./">&larr; Back to dashboard</a>
     </header>
 
     <section>
@@ -144,7 +156,14 @@
       <div class="row">
         <div class="field">
           <label class="fl" for="repo">Target repo (owner/name)</label>
-          <input type="text" id="repo" placeholder="your-org/your-lv-repo" autocomplete="off" spellcheck="false">
+          <input type="text" id="repo" placeholder="your-org/your-lv-repo" autocomplete="off" spellcheck="false" list="repoList">
+          <datalist id="repoList"></datalist>
+          <p class="hint repopick" id="repoPickHint" style="display:none"></p>
+          <div class="repopick-row" id="repoTokRow" style="display:none">
+            <input id="repoTokInput" type="password" autocomplete="off" placeholder="github_pat_&hellip;">
+            <button type="button" class="ghost mini" id="repoTokUse">List my repos</button>
+            <a id="repoTokCreate" target="_blank" rel="noopener" class="mini" title="Tip: under Repository access choose All repositories to list every repo here.">Create a token&#8599;</a>
+          </div>
         </div>
         <div class="field">
           <label class="fl" for="version">LabVIEW version</label>
@@ -155,16 +174,16 @@
           <label class="fl">Operating systems</label>
           <div class="os-toggle" id="osToggle">
             <label class="toggle"><input type="checkbox" value="windows" checked> Windows</label>
-            <label class="toggle"><input type="checkbox" value="linux"> Linux</label>
+            <label class="toggle"><input type="checkbox" value="linux" checked> Linux</label>
           </div>
-          <p class="hint" style="margin-top:6px">Linux container jobs run on the NI base image and are <strong>experimental</strong> &mdash; opt in only if you want them. Windows is the supported default.</p>
+          <p class="hint" style="margin-top:6px">Linux container jobs run on the NI base image by default. The Linux Beta/VIPM lane is experimental and opt-in below.</p>
         </div>
       </div>
     </section>
 
     <section>
       <h2>2. Capabilities</h2>
-      <p class="hint">All available capabilities are selected by default &mdash; uncheck any you don't want. Dependencies are added automatically.</p>
+      <p class="hint">Stable and advanced capabilities are selected by default. Experimental features are off unless you opt in. Dependencies are added automatically.</p>
       <div class="caps" id="caps"></div>
     </section>
 
@@ -277,7 +296,7 @@
   <script>
   (() => {
     "use strict";
-    const SOURCE_FALLBACK = { repo: "elijah286/LabVIEW-CI-with-Containers", ref: "main" };
+    const SOURCE_FALLBACK = { repo: "elijah286/LabVIEW-CI-test", ref: "main" };
     const TEXT_EXTS = new Set([".yml",".yaml",".ps1",".sh",".py",".html",".htm",".md",".json",".xml",".viancfg",".txt",".cfg",".css",".js",".svg"]);
     const NO_SUB_PREFIX = ".github/labview-ci/";
 
@@ -286,7 +305,8 @@
     let relocated = null;         // {from,to} when the tooling has moved to a new official home
     let activeTab = "bash";
     const selected = new Set();   // capability ids the user checked
-    const osSel = new Set(["windows"]);   // Windows is the supported default; Linux container jobs are experimental (NI base image) and opt-in via Configure Workers
+    const EXPERIMENTAL_STATUS = "experimental";
+    const osSel = new Set(["windows", "linux"]);   // Stable Windows + Linux jobs are selected by default; experimental lanes stay opt-in below.
     let priorState = null;        // set by detectPriorInstall when re-installing over an existing setup
     let insRunId = 0;             // bumped per install run; guards the async publish-wait UI against a newer install
 
@@ -373,17 +393,22 @@
       sel.setAttribute("aria-disabled", "true");
     }
 
+    function isPlanned(cap) { return cap && cap.status === "planned"; }
+    function isExperimental(cap) { return cap && cap.status === EXPERIMENTAL_STATUS; }
+    function experimentalCaps() { return (catalog.capabilities || []).filter(c => isExperimental(c)); }
+
     function renderCaps() {
       const host = $("caps");
       host.innerHTML = "";
-      catalog.capabilities.forEach(cap => {
-        const planned = cap.status === "planned";
+      selected.clear();
+      catalog.capabilities.filter(cap => !isExperimental(cap)).forEach(cap => {
+        const planned = isPlanned(cap);
         const wrap = document.createElement("label");
         wrap.className = "cap" + (planned ? " disabled" : "");
         const cb = document.createElement("input");
         cb.type = "checkbox"; cb.value = cap.id; cb.disabled = planned;
-        // All available capabilities are on by default (everything except the
-        // ones still marked "Coming soon", which can't be installed yet).
+        // Available non-experimental capabilities are on by default. Experimental
+        // ones are grouped in a separate opt-in card below.
         cb.checked = !planned;
         if (cb.checked) selected.add(cap.id);
         cb.addEventListener("change", () => {
@@ -396,6 +421,7 @@
         if (cap.recommended) badges.push('<span class="badge rec">Recommended</span>');
         if (cap.status === "advanced") badges.push('<span class="badge adv">Advanced</span>');
         if (planned) badges.push('<span class="badge planned">Coming soon</span>');
+        if (isExperimental(cap)) badges.push('<span class="badge exp">Experimental</span>');
         const osBadges = (cap.supportsOs || []).map(o => `<span class="badge os">${o}</span>`).join("");
         body.innerHTML =
           `<div class="name">${cap.name}${badges.join("")}</div>` +
@@ -406,6 +432,34 @@
         wrap.dataset.id = cap.id;
         host.appendChild(wrap);
       });
+      renderExperimentalCard(host);
+    }
+
+    function renderExperimentalCard(host) {
+      const caps = experimentalCaps().filter(cap => !isPlanned(cap));
+      if (!caps.length) return;
+      const wrap = document.createElement("div");
+      wrap.className = "cap";
+      wrap.dataset.id = "__experimental";
+      const cb = document.createElement("input");
+      cb.type = "checkbox"; cb.value = "__experimental"; cb.checked = false;
+      cb.addEventListener("change", () => {
+        caps.forEach(cap => {
+          if (cb.checked) { selected.add(cap.id); addRequires(cap.id); }
+          else selected.delete(cap.id);
+        });
+        syncChecks(); update();
+      });
+      const body = document.createElement("div");
+      const included = caps.map(cap =>
+        `<li><strong>${esc(cap.name)}</strong> - ${esc(cap.summary)}</li>`
+      ).join("");
+      body.innerHTML =
+        `<div class="name">Experimental features<span class="badge exp">Experimental</span></div>` +
+        `<div class="desc">Opt into features still being proven before they become part of the default installer path.</div>` +
+        `<details class="exp-details"><summary>Included experimental features</summary><ul>${included}</ul></details>`;
+      wrap.appendChild(cb); wrap.appendChild(body);
+      host.appendChild(wrap);
     }
 
     function byId(id) { return catalog.capabilities.find(c => c.id === id); }
@@ -418,7 +472,13 @@
     function syncChecks() {
       document.querySelectorAll(".cap").forEach(el => {
         const cb = el.querySelector("input");
-        if (cb && !cb.disabled) cb.checked = selected.has(el.dataset.id);
+        if (!cb || cb.disabled) return;
+        if (el.dataset.id === "__experimental") {
+          const ids = experimentalCaps().filter(cap => !isPlanned(cap)).map(cap => cap.id);
+          cb.checked = ids.length > 0 && ids.every(id => selected.has(id));
+        } else {
+          cb.checked = selected.has(el.dataset.id);
+        }
       });
     }
 
@@ -486,6 +546,7 @@
       $("download").disabled = noneReal;
       const ib = $("installBtn"); if (ib) ib.disabled = noneReal;
       const tl = $("insTokLink"); if (tl) tl.href = tokenUrl();
+      const rtc = $("repoTokCreate"); if (rtc) rtc.href = tokenUrl();
       const tr = $("insTokRepo"); if (tr) tr.textContent = $("repo").value.trim() || "your-org/your-repo";
       renderTokPanel();
     }
@@ -644,6 +705,81 @@
     function refreshInsForget() { const f = $("insTokForget"); if (f) f.style.display = getInsTok() ? "" : "none"; }
     function showInsTokPanel() { const p = $("insTokPanel"); if (p) { p.style.display = ""; const i = $("insTokInput"); if (i) i.focus(); } }
     function hideInsTokPanel() { const p = $("insTokPanel"); if (p) p.style.display = "none"; }
+
+    // ---- target-repo picker (datalist) -----------------------------------
+    // If an install token is already saved, list the repos it can see and offer
+    // them as <datalist> suggestions on the target-repo field. A datalist never
+    // restricts typing, so free-form owner/name entry still works. With no token
+    // the field is unchanged; a small link lets the user create one to fill the list.
+    let repoListToken = null;   // the token the current datalist was built from (null = unloaded)
+
+    function showRepoTokRow() {
+      const row = $("repoTokRow"); if (row) row.style.display = "flex";
+      const a = $("repoTokCreate"); if (a) a.href = tokenUrl();
+      const i = $("repoTokInput"); if (i) i.focus();
+    }
+    function hideRepoTokRow() { const row = $("repoTokRow"); if (row) row.style.display = "none"; }
+
+    function renderRepoPick(state, info) {
+      const host = $("repoPickHint"); if (!host) return;
+      if (!getInsTok()) {
+        host.style.display = "";
+        host.innerHTML = `<a id="repoPickStart" href="javascript:void 0">Pick from your repositories&hellip;</a>`;
+        const a = $("repoPickStart"); if (a) a.addEventListener("click", e => { e.preventDefault(); showRepoTokRow(); });
+        return;
+      }
+      let msg = "";
+      if (state === "loading")      msg = "Loading your repositories\u2026";
+      else if (state === "error")   msg = `Couldn\u2019t list your repositories${info ? " (HTTP " + info + ")" : ""} \u2014 type the owner/name. <a id="repoPickForget" href="javascript:void 0">Use a different token</a>`;
+      else if (state === "empty")   msg = `No repositories visible to this token \u2014 type the owner/name, or <a id="repoPickForget" href="javascript:void 0">use a token with more access</a>.`;
+      else if (state === "loaded")  msg = `Showing ${info} of your repositories \u2014 or type any owner/name. <a id="repoPickForget" href="javascript:void 0">Forget token</a>`;
+      if (!msg) { host.style.display = "none"; host.innerHTML = ""; return; }
+      host.style.display = ""; host.innerHTML = msg;
+      const f = $("repoPickForget");
+      if (f) f.addEventListener("click", e => {
+        e.preventDefault();
+        clearInsTok(); refreshInsForget();
+        const dl = $("repoList"); if (dl) dl.innerHTML = "";
+        repoListToken = null; renderRepoPick();
+      });
+    }
+
+    // Lists repos the saved install token can read (Metadata is automatic on every
+    // fine-grained PAT). A token scoped to only the target repo yields just that one;
+    // an "All repositories" token lists them all. Bounded to 1000 to stay cheap.
+    async function loadRepoList(force) {
+      const dl = $("repoList"); if (!dl) return;
+      const tok = getInsTok();
+      if (!tok) { dl.innerHTML = ""; repoListToken = null; renderRepoPick(); return; }
+      if (!force && repoListToken === tok) return;   // already built for this token
+      renderRepoPick("loading");
+      try {
+        const names = [];
+        for (let page = 1; page <= 10; page++) {     // bounded: up to 1000 repos
+          const resp = await gh(`/user/repos?per_page=100&sort=pushed&affiliation=owner,collaborator,organization_member&page=${page}`);
+          if (!resp.ok) { repoListToken = null; renderRepoPick("error", resp.status); return; }
+          const arr = await resp.json();
+          if (!Array.isArray(arr) || !arr.length) break;
+          for (const r of arr) if (r && r.full_name) names.push(r.full_name);
+          if (arr.length < 100) break;
+        }
+        const seen = new Set(), uniq = [];
+        for (const n of names) { const k = n.toLowerCase(); if (!seen.has(k)) { seen.add(k); uniq.push(n); } }
+        dl.innerHTML = uniq.map(n => `<option value="${esc(n)}"></option>`).join("");
+        repoListToken = tok;
+        renderRepoPick(uniq.length ? "loaded" : "empty", uniq.length);
+      } catch (_) {
+        repoListToken = null; renderRepoPick("error");
+      }
+    }
+
+    function useRepoTokFromRow() {
+      const i = $("repoTokInput"); const v = (i && i.value || "").trim();
+      if (!v) { if (i) i.focus(); return; }
+      setInsTok(v); refreshInsForget(); if (i) i.value = "";
+      hideRepoTokRow();
+      loadRepoList(true);
+    }
 
     const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
@@ -867,7 +1003,7 @@
         "    runs-on: ubuntu-latest",
         "    steps:",
         "      - name: Checkout repository",
-        "        uses: actions/checkout@v4",
+        "        uses: actions/checkout@v5",
         "      - name: Read opted-in tooling ref from config",
         "        id: cfg",
         "        shell: bash",
@@ -875,7 +1011,7 @@
         "          REF=$(awk '/^[[:space:]]*ref:[[:space:]]/{print $2; exit}' .github/labview-ci.yml 2>/dev/null)",
         '          echo "ref=${REF:-' + ref + '}" >> "$GITHUB_OUTPUT"',
         "      - name: Check out tooling (opted-in version)",
-        "        uses: actions/checkout@v4",
+        "        uses: actions/checkout@v5",
         "        with:",
         "          repository: " + s.repo,
         "          ref: ${{ steps.cfg.outputs.ref }}",
@@ -885,7 +1021,7 @@
         "        with:",
         "          github-token: ${{ secrets.GITHUB_TOKEN }}",
         "      - name: Deploy dashboard to GitHub Pages",
-        "        uses: peaceiris/actions-gh-pages@v4",
+        "        uses: peaceiris/actions-gh-pages@v4.1.0",
         "        with:",
         "          github_token: ${{ secrets.GITHUB_TOKEN }}",
         "          publish_dir: ci-out/dashboard",
@@ -936,8 +1072,27 @@
       if (r.ok) { const j = await r.json(); path = j.path || "README.md"; existing = b64decodeText(j.content || ""); }
       else if (r.status !== 404) await ghJson(r);
       if (existing != null) {
-        if (/labview-ci:dashboard/.test(existing)) return null;
-        return { path, content: insertReadmeSection(existing, repo), isText: true };
+        const hasMarker = /labview-ci:dashboard/.test(existing);
+        const isMarkdown = /\.(md|markdown|mdown|mkdn?)$/i.test(path);
+        // Already linked from a real MARKDOWN README -> nothing to do (the badge
+        // and links render there, so a re-install must not duplicate the section).
+        if (hasMarker && isMarkdown) return null;
+        if (isMarkdown) {
+          return { path, content: insertReadmeSection(existing, repo), isText: true };
+        }
+        // Markdown badges/links only render in a MARKDOWN README. If the repo's
+        // README is plain text (e.g. ReadMe.txt) or another non-markdown format,
+        // editing it in place would show the raw "[![badge](...)](...)" source
+        // instead of a link, so create a proper README.md (GitHub ranks it ABOVE
+        // README.txt for rendering) with the dashboard section on top and the
+        // original prose kept below, and leave the existing file untouched. If an
+        // earlier install already spliced the (non-rendering) section into this
+        // plain-text file, drop that copy first so it isn't duplicated.
+        let prose = existing;
+        if (hasMarker) prose = prose.split(readmeSection(repo)).join("").replace(/\n{3,}/g, "\n\n");
+        prose = prose.replace(/^\s+/, "").replace(/\s+$/, "");
+        const body = `# ${repo.split("/")[1]}\n\n` + readmeSection(repo) + (prose ? "\n" + prose : "");
+        return { path: "README.md", content: body, isText: true };
       }
       return { path: "README.md", content: `# ${repo.split("/")[1]}\n\n` + readmeSection(repo), isText: true };
     }
@@ -1112,6 +1267,53 @@
       return false;
     }
 
+    // Kick off the worker container IMAGE build the moment the install merges, when
+    // the custom-image capability is installed. Every Windows container activity (mass
+    // compile, VI Analyzer, VIDiff, snapshots, unit tests, Antidoc) runs inside
+    // ghcr.io/<owner>/<repo>-labview, which is built with the baked dependency VIPC and
+    // does NOT exist until this build runs — so a fresh install must build it once.
+    // build-labview-image.yml never auto-runs on the install merge (it only adds
+    // .github/** files, which its push trigger excludes), so we dispatch it here.
+    // Best-effort: a 404 means the workflow isn't on the default branch yet (rare), so
+    // we briefly retry, then fall back silently (the dashboard's Build worker image
+    // button and the first CI run's wait-for-image both cover it).
+    async function buildWorkerImageNow(repo, branch) {
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const r = await gh(`/repos/${repo}/actions/workflows/build-labview-image.yml/dispatches`,
+            { method: "POST", body: { ref: branch } });
+          if (r.ok || r.status === 204) return true;
+          if (r.status !== 404) return false;   // real error (e.g. perms) — stop retrying
+        } catch (_) { /* transient network — retry */ }
+        await sleep(3000);                       // workflow not on the default branch yet
+      }
+      return false;
+    }
+
+    // Semver-ish compare (major.minor.patch). Returns >0 when a>b, <0 when a<b.
+    function cmpVerStr(a, b) {
+      const pa = String(a || "").split(".").map(Number), pb = String(b || "").split(".").map(Number);
+      for (let i = 0; i < 3; i++) { const d = (pa[i] || 0) - (pb[i] || 0); if (d) return d > 0 ? 1 : -1; }
+      return 0;
+    }
+    // Is the dashboard's PUBLISHED catalog.json at least version `want`? Reads the
+    // catalog.json sitting next to the dashboard URL (GitHub Pages sends
+    // Access-Control-Allow-Origin:* so this cross-origin read works). Used to
+    // confirm a re-install/update actually republished, rather than the OLD
+    // dashboard simply still being served.
+    async function deployedAtLeast(dashUrl, want) {
+      try {
+        const dir = dashUrl.replace(/[^/]*$/, "");            // .../repo/  or strip a trailing index.html
+        const ctrl = new AbortController();
+        const to = setTimeout(() => ctrl.abort(), 8000);
+        const res = await fetch(dir + "catalog.json?_=" + Date.now(), { cache: "no-store", signal: ctrl.signal });
+        clearTimeout(to);
+        if (!res.ok) return false;
+        const cat = await res.json();
+        return !!(cat && cat.version && cmpVerStr(cat.version, want) >= 0);
+      } catch (_) { return false; }
+    }
+
     // Watch the published dashboard URL until GitHub Pages actually serves it, so the
     // success link is NEVER revealed while it would 404. GitHub Pages returns
     // `Access-Control-Allow-Origin: *` on every response (200 AND 404), so this
@@ -1125,6 +1327,8 @@
       opts = opts || {};
       const FIRST200_CAP = opts.first200Cap || 6 * 60 * 1000;   // wait this long for the URL to stop 404ing
       const REAL_CAP     = opts.realCap || 90 * 1000;           // after the first 200, wait for the real page
+      const EXPECT       = opts.expectVersion || "";            // require the deployed catalog to reach this version
+      const VERSION_CAP  = opts.versionCap || FIRST200_CAP;     // how long to wait for that NEW version to publish
       const INTERVAL     = 4000;
       const t0 = Date.now();
       let firstOkAt = 0;
@@ -1146,8 +1350,16 @@
         const now = Date.now();
         if (ok) {
           if (!firstOkAt) firstOkAt = now;
-          if (!isPlaceholder) return "live";
-          if (now - firstOkAt >= REAL_CAP) return "placeholder";
+          if (!isPlaceholder) {
+            // A real dashboard is serving. When we're replacing an EXISTING dashboard
+            // (a re-install / update), the OLD page is already non-placeholder, so it
+            // would read as "live" instantly. Don't call it done until the deployed
+            // catalog actually reflects the version we just installed.
+            if (!EXPECT || await deployedAtLeast(url, EXPECT)) return "live";
+            if (now - t0 >= VERSION_CAP) return "stale";          // new version didn't publish in time
+          } else if (now - firstOkAt >= REAL_CAP) {
+            return "placeholder";
+          }
         } else if (!firstOkAt && now - t0 >= FIRST200_CAP) {
           return "pending";
         }
@@ -1191,6 +1403,7 @@
       if (setup.readme) done.push(`Added a CI dashboard badge &amp; link to your README (in the pull request).`);
       if (setup.workflowPerms === "done") done.push(`Set <strong>Workflow permissions</strong> to read &amp; write.`);
       if (setup.toolingToken === "done") done.push(`Saved a one-time <strong>update token</strong> &mdash; future <em>Update now</em> clicks open their pull request automatically.`);
+      if (setup.buildImage && autoMerge) done.push(`Started building your <strong>worker container image</strong> &mdash; the container CI activities (mass compile, VI Analyzer, VIDiff, snapshots, unit tests, Antidoc) become available once it finishes (a few minutes). Running one before then waits for the build rather than failing.`);
       // Show the dashboard URL as PLAIN TEXT until Pages is confirmed serving it
       // (revealLiveLink upgrades #insLiveUrl to a real link) so we never present a
       // link that 404s. When Pages already existed it's almost certainly live, so
@@ -1206,6 +1419,7 @@
       if (setup.workflowPerms !== "done") steps.push(`Set <strong>Workflow permissions</strong> to <em>Read and write</em> (<a href="https://github.com/${esc(repo)}/settings/actions" target="_blank" rel="noopener">Settings &rsaquo; Actions &rsaquo; General</a>).`);
       if (setup.hasDashboard && setup.pages !== "done" && setup.pages !== "exists")
         steps.push(`After you merge, the dashboard build publishes the <code class="inl">gh-pages</code> branch \u2014 then enable <strong>GitHub Pages</strong> from it (<a href="https://github.com/${esc(repo)}/settings/pages" target="_blank" rel="noopener">Settings &rsaquo; Pages</a>). No CI run is required.`);
+      if (setup.buildImage && !autoMerge) steps.push(`After you merge, build the <strong>worker container image</strong> once \u2014 run <strong>Build LabVIEW CI Image</strong> (<a href="https://github.com/${esc(repo)}/actions" target="_blank" rel="noopener">Actions</a>) or use <strong>&#9881; Configure Workers</strong>. The container CI activities (mass compile, VI Analyzer, VIDiff, snapshots, unit tests, Antidoc) run inside it.`);
       const nextEl = $("insNext");
       if (nextEl) { nextEl.innerHTML = steps.map(s => `<li>${s}</li>`).join(""); nextEl.style.display = ""; }
 
@@ -1242,6 +1456,10 @@
         }
         const nx = $("insNext"); if (nx) nx.style.display = "none";
 
+        // Build the worker container image now so the container CI activities have an
+        // image to run in (it never builds itself on the install merge). Best-effort.
+        if (setup.buildImage) buildWorkerImageNow(repo, setup.branch);
+
         const mergedDashboard = setup.hasDashboard && !!setup.branch;
         if (!mergedDashboard) {
           // No dashboard to publish in this install — the merge is the whole story.
@@ -1270,7 +1488,7 @@
             if (insRunId !== myGen) return;
             const secs = Math.round(elapsed / 1000);
             setInsStatus(`&#10003; Merged <a href="${esc(pr.html_url)}" target="_blank" rel="noopener">#${pr.number}</a> \u2014 publishing your dashboard\u2026 GitHub Pages is building it (${secs}s). The link appears here the moment it&rsquo;s live.`, "ok");
-          }, { first200Cap: 6 * 60 * 1000 })
+          }, { first200Cap: 6 * 60 * 1000, expectVersion: (catalog && catalog.version) || "" })
         ).then(state => {
           if (insRunId !== myGen) return;
           if (state === "live" || state === "placeholder") {
@@ -1282,10 +1500,13 @@
               : `&#10003; Done \u2014 your dashboard is publishing at <a href="${esc(url)}" target="_blank" rel="noopener">${esc(url)}</a> and finishes rendering within a minute (merged <a href="${esc(pr.html_url)}" target="_blank" rel="noopener">#${pr.number}</a>).`, "ok");
             return;
           }
-          // "pending": Pages is on but the page didn't serve in time (slow build).
-          // Don't claim done or show a 404 link; the URL stays plain text.
+          // Not "live"/"placeholder": either "pending" (Pages never served in time) or
+          // "stale" (a real page serves but still the PREVIOUS version -- the new build
+          // hasn't published yet). Never claim done; say honestly what's left.
           setInsBar(null, "warn");
-          setInsStatus(`&#10003; Merged <a href="${esc(pr.html_url)}" target="_blank" rel="noopener">#${pr.number}</a> \u2014 your dashboard is taking longer than usual to publish. It will appear at <code class="inl">${esc(url)}</code> once GitHub Pages finishes building; refresh in a minute.`, "warn");
+          setInsStatus(state === "stale"
+            ? `&#10003; Merged <a href="${esc(pr.html_url)}" target="_blank" rel="noopener">#${pr.number}</a> \u2014 your dashboard is updating to <strong>v${esc((catalog && catalog.version) || "")}</strong>, but GitHub Pages is still serving the previous build. It refreshes at <code class="inl">${esc(url)}</code> within a minute or two \u2014 reload to confirm the new version.`
+            : `&#10003; Merged <a href="${esc(pr.html_url)}" target="_blank" rel="noopener">#${pr.number}</a> \u2014 your dashboard is taking longer than usual to publish. It will appear at <code class="inl">${esc(url)}</code> once GitHub Pages finishes building; refresh in a minute.`, "warn");
         }).catch(() => {
           if (insRunId !== myGen) return;
           setInsBar(null, "warn");
@@ -1550,6 +1771,11 @@
         // part of this install (its publish workflow is in the resolved set).
         setup.hasDashboard = [...paths].some(p => p.endsWith("dashboard-pages.yml"));
 
+        // The custom worker container image (ghcr.io/<owner>/<repo>-labview) is what
+        // every Windows container activity runs in, and it does NOT exist until it is
+        // built — so a fresh install must build it once. Remember whether to do that.
+        setup.buildImage = activities.includes("custom-image") && osList.includes("windows");
+
         if ($("optReadme") && $("optReadme").checked && setup.hasDashboard) {
           setInsStatus("Preparing the README link&hellip;", null);
           try { const rf = await buildReadmeFile(repo); if (rf) { files.push(rf); setup.readme = true; } }
@@ -1562,6 +1788,18 @@
         const branch = meta && meta.default_branch;
         if (!branch) throw new Error("Your repository has no commits yet. Push an initial commit (e.g. a README) first, then install.");
         setup.branch = branch;   // remembered so we can dispatch the dashboard build right after an auto-merge
+        // The workflow push triggers are vendored with a static `branches: [main]`
+        // filter, which YAML can't express as the repo's default branch. Rewrite it
+        // to the target repo's actual default branch so push-to-default CI fires on
+        // repos whose default branch isn't "main" (e.g. "master"). main-default
+        // repos keep the original text untouched.
+        if (branch && branch !== "main") {
+          for (const f of files) {
+            if (f && f.isText && typeof f.content === "string" && f.path && f.path.indexOf(".github/workflows/") === 0) {
+              f.content = f.content.split("branches: [main]").join("branches: [" + branch + "]");
+            }
+          }
+        }
         setup.private = !!(meta && meta.private);   // private repos can't publish Pages on a free plan
         const headRef = await ghWrite(`/repos/${repo}/git/ref/heads/${encodeURIComponent(branch)}`, null, "read the default branch");
         const headSha = headRef.object.sha;
@@ -1689,8 +1927,10 @@
       $("installBtn").addEventListener("click", installToRepo);
       $("insTokSave").addEventListener("click", saveInsTokAndInstall);
       $("insTokCancel").addEventListener("click", hideInsTokPanel);
-      $("insTokForget").addEventListener("click", () => { clearInsTok(); refreshInsForget(); setInsStatus("Token removed from this browser.", null); });
+      $("insTokForget").addEventListener("click", () => { clearInsTok(); refreshInsForget(); const _dl = $("repoList"); if (_dl) _dl.innerHTML = ""; repoListToken = null; renderRepoPick(); setInsStatus("Token removed from this browser.", null); });
       const _iti = $("insTokInput"); if (_iti) _iti.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); saveInsTokAndInstall(); } });
+      const _rtu = $("repoTokUse"); if (_rtu) _rtu.addEventListener("click", useRepoTokFromRow);
+      const _rti = $("repoTokInput"); if (_rti) _rti.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); useRepoTokFromRow(); } });
       const _rg = $("insReinstallGo"); if (_rg) _rg.addEventListener("click", confirmReinstall);
       const _rc = $("insReinstallCancel"); if (_rc) _rc.addEventListener("click", () => { hideReinstallPanel(); installBusy(false); setInsStatus("Install cancelled \u2014 nothing was changed.", null); });
       const _ok = $("optKeep"); if (_ok) _ok.addEventListener("change", renderStalePreview);
@@ -1706,6 +1946,7 @@
         return;
       }
       renderVersions(); renderCaps(); wire(); update(); refreshInsForget();
+      renderRepoPick(); loadRepoList();
 
       // The tooling has relocated: tell the user their install comes from the new
       // official home (and this page followed the pointer to get there).
