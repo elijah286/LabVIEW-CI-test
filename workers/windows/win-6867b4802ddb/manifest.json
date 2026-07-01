@@ -6,9 +6,9 @@
   "base_image": "ghcr.io/elijah286/labview-ci-test-labview-vipm-base:2026",
   "base_digest": "ghcr.io/elijah286/labview-ci-test-labview-vipm-base@sha256:c16b166226bbd4ec3967b1f249a0c98f6af3efb040b32a5aaa797c7e25cd5c19",
   "image_ref": "ghcr.io/elijah286/labview-ci-test-labview:win-6867b4802ddb",
-  "build_date": "2026-06-22T23:26:44Z",
+  "build_date": "2026-07-01T06:58:32Z",
   "git_sha": "1bd3d8bb966517cb26cd970f40bae441122b2caf",
-  "run_url": "https://github.com/elijah286/LabVIEW-CI-test/actions/runs/27986621413",
+  "run_url": "https://github.com/elijah286/LabVIEW-CI-test/actions/runs/28496150186",
   "vipc": [
     {
       "file": "ci-tooling.vipc",
