@@ -1043,8 +1043,8 @@
     // activities to queue. Reuses dispatchCells (oldest-first, snapshots as one
     // backfill) + the same token and optimistic-queued bridge as every other
     // dispatch on the dashboard.
-    var HIST = [];                        // [{sha, short, msg}] newest-first (project revisions)
-    var RAN = {};                     // {cap:1} caps with a result/active run somewhere in history
+    var HIST = [{"sha": "7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2", "short": "7c1b9a0", "msg": "added unit tests"}, {"sha": "20b168716243bfc7959db6027a2c92607d276b65", "short": "20b1687", "msg": "new launcher"}, {"sha": "678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed", "short": "678e3f7", "msg": "New project"}];                        // [{sha, short, msg}] newest-first (project revisions)
+    var RAN = {"antidoc": 1, "snapshots": 1, "unit-tests": 1, "vi-analyzer": 1, "vidiff": 1};                     // {cap:1} caps with a result/active run somewhere in history
     var CAP_META = {                            // label + sub for each known capability
       'snapshots':   ['VI Snapshots', 'Renders every changed VI (one backfill pass)'],
       'vidiff':      ['VIDiff',       'Visual diff of the VIs each revision changed'],
@@ -1373,7 +1373,7 @@
   </script>
   <main class="lvci-main">
   <h1>CI Dashboard — LabVIEW-CI-test</h1>
-  <div class="sub">Last updated: 2026-07-16 23:18 UTC &nbsp;|&nbsp; Auto-refreshes every 15 min</div>
+  <div class="sub">Last updated: 2026-07-17 00:31 UTC &nbsp;|&nbsp; Auto-refreshes every 15 min</div>
   <div class="nav">
     <a href="https://github.com/elijah286/LabVIEW-CI-test">GitHub</a>
     <a href="https://github.com/elijah286/LabVIEW-CI-test/actions">Actions</a>
@@ -1412,7 +1412,132 @@
         <th style="text-align:center">Antidoc</th>
       </tr>
     </thead>
-    <tbody></tbody>
+    <tbody>
+    <tr data-project="false">
+      <td class="cidash-rev">
+        <div class="cidash-rev-wrap">
+          <span class="cidash-avatar" style="background:hsl(66,42%,45%)" title="Elijah Kerry" aria-hidden="true">E</span>
+          <div class="cidash-rev-body">
+            <div class="cidash-rev-line1"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=1bd3d8bb966517cb26cd970f40bae441122b2caf" class="cidash-rev-msg" title="Add LabVIEW CI pipeline">Add LabVIEW CI pipeline</a></div>
+            <div class="cidash-rev-meta"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=1bd3d8bb966517cb26cd970f40bae441122b2caf" class="cidash-rev-sha" title="Browse this revision's VIs in the VI Browser">1bd3d8b</a><span class="cidash-rev-dot">&middot;</span>Elijah Kerry<span class="cidash-rev-dot">&middot;</span>2026-06-22</div>
+          </div>
+        </div>
+      </td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+    </tr>
+
+    <tr data-project="true">
+      <td class="cidash-rev">
+        <div class="cidash-rev-wrap">
+          <span class="cidash-avatar" style="background:hsl(66,42%,45%)" title="Elijah Kerry" aria-hidden="true">E</span>
+          <div class="cidash-rev-body">
+            <div class="cidash-rev-line1"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" class="cidash-rev-msg" title="added unit tests">added unit tests</a><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" class="snap-glyph" title="Snapshots exist for this revision" aria-label="Snapshots exist for this revision"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true" style="vertical-align:text-bottom;flex:0 0 auto"><path d="M1.75 2.5a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h.94l8.5-8.5a.25.25 0 0 1 .354 0l1.756 1.757V2.75a.25.25 0 0 0-.25-.25H1.75ZM14.5 9.232 11.06 5.79 3.852 13h9.898a.25.25 0 0 0 .25-.25V9.232ZM1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25V2.75C0 1.784.784 1 1.75 1ZM5.5 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg></a></div>
+            <div class="cidash-rev-meta"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" class="cidash-rev-sha" title="Browse this revision's VIs in the VI Browser">7c1b9a0</a><span class="cidash-rev-dot">&middot;</span>Elijah Kerry<span class="cidash-rev-dot">&middot;</span>2026-06-18</div>
+          </div>
+        </div>
+      </td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="masscompile" data-sha="7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" data-parent="39fb022e04c602318b92fd43c38113f15a7dbecd" data-short="7c1b9a0" title="Run Mass Compile for commit 7c1b9a0">&#9655;</a></td>
+      <td style="text-align:center" class="cidash-cap-cell" data-cap="vi-analyzer" data-sha="7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" data-parent="39fb022e04c602318b92fd43c38113f15a7dbecd" data-short="7c1b9a0" data-ts="2026-06-18T22:52:09Z"><span class="cidash-chip cc-pass"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L1.22 9.28a.75.75 0 1 1 1.06-1.06L6 11.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-analyzer-linux/7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2/index.html" style="color:inherit">analyze</a></span></td>
+      <td style="text-align:center" class="cidash-cap-cell" data-cap="vidiff" data-sha="7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" data-parent="39fb022e04c602318b92fd43c38113f15a7dbecd" data-short="7c1b9a0" data-ts="2026-06-18T22:51:40Z"><span class="cidash-chip cc-pass"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L1.22 9.28a.75.75 0 1 1 1.06-1.06L6 11.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"/></svg><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2&changed=1" style="color:inherit">diff</a></span></td>
+      <td style="text-align:center"><span class="cidash-chip cc-info" title="Snapshots rendered for all 128 VIs in this revision"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" style="color:inherit">128</a></span></td>
+      <td style="text-align:center" class="cidash-cap-cell" data-cap="unit-tests" data-sha="7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" data-parent="39fb022e04c602318b92fd43c38113f15a7dbecd" data-short="7c1b9a0" data-ts="2026-06-18T22:51:12Z"><span class="cidash-chip cc-fail"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><a href="https://github.com/elijah286/LabVIEW-CI-test/actions/runs/27794143145" style="color:inherit">tests</a></span></td>
+      <td style="text-align:center" class="cidash-cap-cell" data-cap="antidoc" data-sha="7c1b9a0902d67ce0f2774ecd9337c3e4d3d5eec2" data-parent="39fb022e04c602318b92fd43c38113f15a7dbecd" data-short="7c1b9a0" data-ts="2026-06-18T22:50:50Z"><span class="cidash-chip cc-fail"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M3.72 3.72a.75.75 0 0 1 1.06 0L8 6.94l3.22-3.22a.75.75 0 1 1 1.06 1.06L9.06 8l3.22 3.22a.75.75 0 1 1-1.06 1.06L8 9.06l-3.22 3.22a.75.75 0 0 1-1.06-1.06L6.94 8 3.72 4.78a.75.75 0 0 1 0-1.06Z"/></svg><a href="https://github.com/elijah286/LabVIEW-CI-test/actions/runs/27794143147" style="color:inherit">docs</a></span></td>
+    </tr>
+
+    <tr data-project="false">
+      <td class="cidash-rev">
+        <div class="cidash-rev-wrap">
+          <span class="cidash-avatar" style="background:hsl(66,42%,45%)" title="Elijah Kerry" aria-hidden="true">E</span>
+          <div class="cidash-rev-body">
+            <div class="cidash-rev-line1"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=39fb022e04c602318b92fd43c38113f15a7dbecd" class="cidash-rev-msg" title="Merge branch &#x27;main&#x27; of https://github.com/elijah286/LabVIEW-CI-test">Merge branch &#x27;main&#x27; of https://github.com/elijah286/LabVIEW-CI-test</a></div>
+            <div class="cidash-rev-meta"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=39fb022e04c602318b92fd43c38113f15a7dbecd" class="cidash-rev-sha" title="Browse this revision's VIs in the VI Browser">39fb022</a><span class="cidash-rev-dot">&middot;</span>Elijah Kerry<span class="cidash-rev-dot">&middot;</span>2026-06-18</div>
+          </div>
+        </div>
+      </td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+    </tr>
+
+    <tr data-project="true">
+      <td class="cidash-rev">
+        <div class="cidash-rev-wrap">
+          <span class="cidash-avatar" style="background:hsl(66,42%,45%)" title="Elijah Kerry" aria-hidden="true">E</span>
+          <div class="cidash-rev-body">
+            <div class="cidash-rev-line1"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=20b168716243bfc7959db6027a2c92607d276b65" class="cidash-rev-msg" title="new launcher">new launcher</a><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=20b168716243bfc7959db6027a2c92607d276b65" class="snap-glyph" title="Snapshots exist for this revision" aria-label="Snapshots exist for this revision"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true" style="vertical-align:text-bottom;flex:0 0 auto"><path d="M1.75 2.5a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h.94l8.5-8.5a.25.25 0 0 1 .354 0l1.756 1.757V2.75a.25.25 0 0 0-.25-.25H1.75ZM14.5 9.232 11.06 5.79 3.852 13h9.898a.25.25 0 0 0 .25-.25V9.232ZM1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25V2.75C0 1.784.784 1 1.75 1ZM5.5 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg></a></div>
+            <div class="cidash-rev-meta"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=20b168716243bfc7959db6027a2c92607d276b65" class="cidash-rev-sha" title="Browse this revision's VIs in the VI Browser">20b1687</a><span class="cidash-rev-dot">&middot;</span>Elijah Kerry<span class="cidash-rev-dot">&middot;</span>2026-06-18</div>
+          </div>
+        </div>
+      </td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="masscompile" data-sha="20b168716243bfc7959db6027a2c92607d276b65" data-parent="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-short="20b1687" title="Run Mass Compile for commit 20b1687">&#9655;</a></td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="vi-analyzer" data-sha="20b168716243bfc7959db6027a2c92607d276b65" data-parent="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-short="20b1687" title="Run VI Analyzer for commit 20b1687">&#9655;</a></td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="vidiff" data-sha="20b168716243bfc7959db6027a2c92607d276b65" data-parent="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-short="20b1687" title="Run VIDiff for commit 20b1687">&#9655;</a></td>
+      <td style="text-align:center"><span class="cidash-chip cc-info" title="Snapshots rendered for all 125 VIs in this revision"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=20b168716243bfc7959db6027a2c92607d276b65" style="color:inherit">125</a></span></td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="unit-tests" data-sha="20b168716243bfc7959db6027a2c92607d276b65" data-parent="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-short="20b1687" title="Run Unit Tests for commit 20b1687">&#9655;</a></td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="antidoc" data-sha="20b168716243bfc7959db6027a2c92607d276b65" data-parent="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-short="20b1687" title="Run Antidoc for commit 20b1687">&#9655;</a></td>
+    </tr>
+
+    <tr data-project="false">
+      <td class="cidash-rev">
+        <div class="cidash-rev-wrap">
+          <span class="cidash-avatar" style="background:hsl(66,42%,45%)" title="Elijah Kerry" aria-hidden="true">E</span>
+          <div class="cidash-rev-body">
+            <div class="cidash-rev-line1"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=177d20d278568a89b07343b594342aca23463e03" class="cidash-rev-msg" title="Add LabVIEW CI pipeline">Add LabVIEW CI pipeline</a></div>
+            <div class="cidash-rev-meta"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=177d20d278568a89b07343b594342aca23463e03" class="cidash-rev-sha" title="Browse this revision's VIs in the VI Browser">177d20d</a><span class="cidash-rev-dot">&middot;</span>Elijah Kerry<span class="cidash-rev-dot">&middot;</span>2026-06-18</div>
+          </div>
+        </div>
+      </td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+    </tr>
+
+    <tr data-project="true">
+      <td class="cidash-rev">
+        <div class="cidash-rev-wrap">
+          <span class="cidash-avatar" style="background:hsl(66,42%,45%)" title="Elijah Kerry" aria-hidden="true">E</span>
+          <div class="cidash-rev-body">
+            <div class="cidash-rev-line1"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" class="cidash-rev-msg" title="New project">New project</a><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" class="snap-glyph" title="Snapshots exist for this revision" aria-label="Snapshots exist for this revision"><svg viewBox="0 0 16 16" width="12" height="12" fill="currentColor" aria-hidden="true" style="vertical-align:text-bottom;flex:0 0 auto"><path d="M1.75 2.5a.25.25 0 0 0-.25.25v10.5c0 .138.112.25.25.25h.94l8.5-8.5a.25.25 0 0 1 .354 0l1.756 1.757V2.75a.25.25 0 0 0-.25-.25H1.75ZM14.5 9.232 11.06 5.79 3.852 13h9.898a.25.25 0 0 0 .25-.25V9.232ZM1.75 1h12.5c.966 0 1.75.784 1.75 1.75v10.5A1.75 1.75 0 0 1 14.25 15H1.75A1.75 1.75 0 0 1 0 13.25V2.75C0 1.784.784 1 1.75 1ZM5.5 6a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/></svg></a></div>
+            <div class="cidash-rev-meta"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" class="cidash-rev-sha" title="Browse this revision's VIs in the VI Browser">678e3f7</a><span class="cidash-rev-dot">&middot;</span>Elijah Kerry<span class="cidash-rev-dot">&middot;</span>2026-06-18</div>
+          </div>
+        </div>
+      </td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="masscompile" data-sha="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-parent="" data-short="678e3f7" title="Run Mass Compile for commit 678e3f7">&#9655;</a></td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="vi-analyzer" data-sha="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-parent="" data-short="678e3f7" title="Run VI Analyzer for commit 678e3f7">&#9655;</a></td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="vidiff" data-sha="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-parent="" data-short="678e3f7" title="Run VIDiff for commit 678e3f7">&#9655;</a></td>
+      <td style="text-align:center"><span class="cidash-chip cc-info" title="Snapshots rendered for all 124 VIs in this revision"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" style="color:inherit">124</a></span></td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="unit-tests" data-sha="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-parent="" data-short="678e3f7" title="Run Unit Tests for commit 678e3f7">&#9655;</a></td>
+      <td style="text-align:center"><a href="#" class="cidash-run" data-cap="antidoc" data-sha="678e3f7f4ecf76bf424bdf96f5220e3c68ea43ed" data-parent="" data-short="678e3f7" title="Run Antidoc for commit 678e3f7">&#9655;</a></td>
+    </tr>
+
+    <tr data-project="false">
+      <td class="cidash-rev">
+        <div class="cidash-rev-wrap">
+          <span class="cidash-avatar" style="background:hsl(66,42%,45%)" title="Elijah Kerry" aria-hidden="true">E</span>
+          <div class="cidash-rev-body">
+            <div class="cidash-rev-line1"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=86979d5a844245491d6c29e795acb8d182e102b8" class="cidash-rev-msg" title="Add LabVIEW CI pipeline">Add LabVIEW CI pipeline</a></div>
+            <div class="cidash-rev-meta"><a href="https://elijah286.github.io/LabVIEW-CI-test/vi-snapshots/index.html?sha=86979d5a844245491d6c29e795acb8d182e102b8" class="cidash-rev-sha" title="Browse this revision's VIs in the VI Browser">86979d5</a><span class="cidash-rev-dot">&middot;</span>Elijah Kerry<span class="cidash-rev-dot">&middot;</span>2026-06-18</div>
+          </div>
+        </div>
+      </td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+      <td style="text-align:center;color:var(--fg-muted);font-size:.75em">—</td>
+    </tr></tbody>
   </table>
   </div>
   <div id="empty-state" style="display:none;padding:18px;text-align:center;color:var(--fg-muted);font-size:.9em">
